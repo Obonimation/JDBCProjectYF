@@ -12,6 +12,7 @@ public class UserDaoJDBCImpl implements UserDao {
 
     }
 
+    @Override
     public void createUsersTable() {
         String sql = """
                 CREATE TABLE IF NOT EXISTS users (
@@ -20,28 +21,30 @@ public class UserDaoJDBCImpl implements UserDao {
                 lastName VARCHAR(255),
                 age TINYINT);
                 """;
-        try (var connection = Util.open();
-             var statement = connection.createStatement()) {
+        try (Connection connection = Util.open();
+             Statement statement = connection.createStatement()) {
             statement.execute(sql);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
+    @Override
     public void dropUsersTable() {
         String sql = "DROP TABLE IF EXISTS users;";
-        try (var connection = Util.open();
-             var statement = connection.createStatement()) {
+        try (Connection connection = Util.open();
+             Statement statement = connection.createStatement()) {
             statement.execute(sql);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
+    @Override
     public void saveUser(String name, String lastName, byte age) {
         String sql = "INSERT INTO users (name, lastName, age) VALUES (?, ?, ?);";
 
-        try (var connection = Util.open();
+        try (Connection connection = Util.open();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, name);
             preparedStatement.setString(2, lastName);
@@ -52,11 +55,12 @@ public class UserDaoJDBCImpl implements UserDao {
         }
     }
 
+    @Override
     public void removeUserById(long id) {
         String sql = "DELETE FROM users WHERE id=?";
 
-        try (var connection = Util.open();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql);) {
+        try (Connection connection = Util.open();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setLong(1, id);
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
@@ -64,11 +68,12 @@ public class UserDaoJDBCImpl implements UserDao {
         }
     }
 
+    @Override
     public List<User> getAllUsers() {
         List<User> userList = new ArrayList<>();
         String sql = "SELECT id, name, lastName, age FROM users;";
 
-        try (var connection = Util.open();
+        try (Connection connection = Util.open();
              Statement statement = connection.createStatement()) {
             ResultSet resultSet = statement.executeQuery(sql);
             while (resultSet.next()) {
@@ -85,10 +90,11 @@ public class UserDaoJDBCImpl implements UserDao {
         return userList;
     }
 
+    @Override
     public void cleanUsersTable() {
         String sql = "DELETE FROM users";
-        try (var connection = Util.open();
-             var statement = connection.createStatement()) {
+        try (Connection connection = Util.open();
+             Statement statement = connection.createStatement()) {
             statement.execute(sql);
         } catch (SQLException e) {
             throw new RuntimeException(e);
